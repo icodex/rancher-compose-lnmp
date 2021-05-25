@@ -10,15 +10,19 @@ networks:
         - subnet: 10.15.0.0/16
 
 services:
-    web:
+    nginx:
         image: nginx:alpine
+        container_name: nginx
         links:
             - php-fpm:php-fpm
-            - mysqldb:mysqldb
+            - mysqld:mysqld
             - phpmyadmin:phpmyadmin
         env_file:
             - ".env"
         volumes:
+            - "./etc/nginx/restrictions.conf:/etc/nginx/restrictions.conf"
+            - "./etc/nginx/phpmyadmin.conf:/etc/nginx/phpmyadmin.conf"
+            - "./etc/nginx/proxy.inc:/etc/nginx/proxy.inc"
             - "./etc/nginx/default.conf:/etc/nginx/conf.d/default.conf"
             - "./etc/ssl:/etc/ssl"
             - "./web:/var/www/html"
@@ -29,19 +33,21 @@ services:
         networks:
             vpcbr:
                 ipv4_address: 10.15.0.2
-        environment:
-            - NGINX_HOST=${NGINX_HOST}
         command: /bin/sh -c "envsubst '$$NGINX_HOST' < /etc/nginx/conf.d/default.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
         restart: always
         depends_on:
             - php-fpm
-            - mysqldb
+            - mysqld
         
     php-fpm:
         image: icodex/php-fpm:${PHP_VERSION}
+        container_name: php-fpm
         restart: always
         env_file:
             - ".env"
+        networks:
+            vpcbr:
+                ipv4_address: 10.15.0.4
         volumes:
             - "./etc/php/php.ini:/usr/local/etc/php/conf.d/php.ini"
             - "./etc/php/www.conf:/usr/local/etc/php-fpm.d/www.conf"
@@ -63,16 +69,13 @@ services:
                 ipv4_address: 10.15.0.5
         env_file:
             - ".env"
-        environment:
-            - PMA_ARBITRARY=1
-            - PMA_HOST=${MYSQL_HOST}
         restart: always
         depends_on:
-            - mysqldb
+            - mysqld
 
-    mysqldb:
+    mysqld:
         image: mysql:${MYSQL_VERSION}
-        container_name: ${MYSQL_HOST}
+        container_name: mysqld
         restart: always
         # ports:
         #     - "3306:3306"
@@ -81,10 +84,5 @@ services:
                 ipv4_address: 10.15.0.3
         env_file:
             - ".env"
-        environment:
-            - MYSQL_DATABASE=${MYSQL_DATABASE}
-            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-            - MYSQL_USER=${MYSQL_USER}
-            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
         volumes:
             - "./data/db/mysql:/var/lib/mysql"
