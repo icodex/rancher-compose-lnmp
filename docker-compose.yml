@@ -31,11 +31,11 @@ services:
     env_file:
       - ".env"
     volumes:
-      - "./etc/nginx/restrictions.conf:/etc/nginx/restrictions.conf"
-      - "./etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
-      - "./etc/nginx/default.conf:/etc/nginx/conf.d/default.conf"
-      - "./etc/nginx/default.template.conf:/etc/nginx/conf.d/default.template"
-      - "./web:/var/www/html"
+      - ./etc/nginx/restrictions.conf:/etc/nginx/restrictions.conf:ro
+      - ./etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./etc/nginx/default.conf:/etc/nginx/conf.d/default.conf:rw
+      - ./etc/nginx/default.template.conf:/etc/nginx/conf.d/default.template:ro
+      - ./web:/var/www/html:rw
     networks:
       - default
     command: /bin/sh -c "envsubst '$$NGINX_HOST' < /etc/nginx/conf.d/default.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
@@ -53,12 +53,12 @@ services:
     networks:
       - default
     volumes:
-      - "./etc/php/php.ini:/usr/local/etc/php/conf.d/php.ini"
-      - "./etc/php/www.conf:/usr/local/etc/php-fpm.d/www.conf"
-      - "./etc/php/zz-docker.conf:/usr/local/etc/php-fpm.d/zz-docker.conf"
-      - "./data/log/php-fpm.log:/var/log/php-fpm.log:rw"
-      - "./data/temp:/temp:rw"
-      - "./web:/var/www/html:rw"
+      - ./etc/php/php.ini:/usr/local/etc/php/conf.d/php.ini:ro
+      - ./etc/php/www.conf:/usr/local/etc/php-fpm.d/www.conf:ro
+      - ./etc/php/zz-docker.conf:/usr/local/etc/php-fpm.d/zz-docker.conf:ro
+      - ./data/log/php-fpm.log:/var/log/php-fpm.log:rw
+      - ./data/temp:/temp:rw
+      - ./web:/var/www/html:rw
     restart: always
 
   redis:
@@ -68,8 +68,8 @@ services:
     networks:
       - default
     volumes:
-      - ./etc/redis/redis.conf:/etc/redis/redis.conf
-      - ./data/redis:/data
+      - ./etc/redis/redis.conf:/etc/redis/redis.conf:rw
+      - ./data/redis:/data:rw
     command: redis-server /etc/redis/redis.conf
     privileged: true
     restart: always
@@ -77,7 +77,7 @@ services:
   composer:
     image: "composer"
     volumes:
-      - "./web/app:/app"
+      - ./web/app:/app:rw
     command: install
 
   phpmyadmin:
@@ -101,5 +101,5 @@ services:
     env_file:
       - ".env"
     volumes:
-      - "./data/db/mysql:/var/lib/mysql"
+      - ./data/db/mysql:/var/lib/mysql:rw
     restart: always
