@@ -56,7 +56,7 @@ services:
       - ./etc/php/php.ini:/usr/local/etc/php/conf.d/php.ini:ro
       - ./etc/php/www.conf:/usr/local/etc/php-fpm.d/www.conf:ro
       - ./etc/php/zz-docker.conf:/usr/local/etc/php-fpm.d/zz-docker.conf:ro
-      - ./data/log/php-fpm.log:/var/log/php-fpm.log:rw
+      - ./data/log:/var/log:rw
       - ./data/temp:/temp:rw
       - ./web:/var/www/html:rw
     restart: always
