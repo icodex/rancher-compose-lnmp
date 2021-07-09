@@ -56,9 +56,9 @@ services:
       - "./etc/php/php.ini:/usr/local/etc/php/conf.d/php.ini"
       - "./etc/php/www.conf:/usr/local/etc/php-fpm.d/www.conf"
       - "./etc/php/zz-docker.conf:/usr/local/etc/php-fpm.d/zz-docker.conf"
-      - "./data/log/php-fpm.log:/var/log/php-fpm.log"
-      - "./data/temp:/temp"
-      - "./web:/var/www/html"
+      - "./data/log/php-fpm.log:/var/log/php-fpm.log:rw"
+      - "./data/temp:/temp:rw"
+      - "./web:/var/www/html:rw"
     restart: always
 
   redis:
