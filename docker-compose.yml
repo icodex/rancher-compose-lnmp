@@ -61,6 +61,19 @@ services:
       - "./web:/var/www/html"
     restart: always
 
+  redis:
+    image: redis:latest
+    expose:
+      - 6379
+    networks:
+      - default
+    volumes:
+      - ./etc/redis/redis.conf:/etc/redis/redis.conf
+      - ./data/redis:/data
+    command: redis-server /etc/redis/redis.conf
+    privileged: true
+    restart: always
+
   composer:
     image: "composer"
     volumes:
