@@ -93,7 +93,7 @@ services:
       - mysqld
 
   mysqld:
-    image: mysql:${MYSQL_VERSION}
+    image: mariadb:${MYSQL_VERSION}
     networks:
       - default
     expose:
