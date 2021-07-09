@@ -81,7 +81,7 @@ services:
     command: install
 
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin
+    image: phpmyadmin
     networks:
       - default
     expose:
