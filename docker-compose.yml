@@ -13,8 +13,6 @@ services:
   haproxy:
     container_name: haproxy
     image: icodex/docker-haproxy
-    links:
-      - nginx:nginx
     ports:
       - 80:80/tcp
       - 443:443/tcp
@@ -28,16 +26,13 @@ services:
 
   nginx:
     image: nginx:alpine
-    links:
-      - php-fpm:php-fpm
-      - mysqld:mysqld
-      - phpmyadmin:phpmyadmin
-    ports:
+    expose:
       - 80
     env_file:
       - ".env"
     volumes:
       - "./etc/nginx/restrictions.conf:/etc/nginx/restrictions.conf"
+      - "./etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
       - "./etc/nginx/default.conf:/etc/nginx/conf.d/default.conf"
       - "./etc/nginx/default.template.conf:/etc/nginx/conf.d/default.template"
       - "./web:/var/www/html"
@@ -53,7 +48,7 @@ services:
     image: icodex/php-fpm:${PHP_VERSION}
     env_file:
       - ".env"
-    ports:
+    expose:
       - 3000
     networks:
       - default
@@ -76,7 +71,7 @@ services:
     image: phpmyadmin/phpmyadmin
     networks:
       - default
-    ports:
+    expose:
       - 80
     env_file:
       - ".env"
@@ -88,7 +83,7 @@ services:
     image: mysql:${MYSQL_VERSION}
     networks:
       - default
-    ports:
+    expose:
       - 3306
     env_file:
       - ".env"
